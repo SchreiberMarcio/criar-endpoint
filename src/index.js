@@ -30,7 +30,7 @@ app.post("/tarefas", (req, res) => {
     concluida: concluida,
   };
 
-  tarefas.push(novaTarefa); //Code metrics
+  tarefas.push(novaTarefa); 
 
   res
     .status(201)
@@ -58,5 +58,49 @@ console.log(tarefaSelecionada);
     .status(200)
     .json({ message: `Tarefa selecionada é: ${tarefaSelecionada.descricao}` });
 });
+
+
+app.put("/tarefas/:id", (req, res) => {
+  const { id } = req.params;
+  const { descricao, concluida } = req.body;
+
+  const tarefaIndex = tarefas.findIndex((tarefa) => tarefa.id === parseInt(id));
+  if (tarefaIndex === -1) {
+      return res.status(404).json({ message: "Tarefa não encontrada." });
+  }
+
+  if (descricao) {
+      tarefas[tarefaIndex].descricao = descricao;
+  }
+
+  if (concluida !== "sim" && concluida !== "não") {
+      tarefas[tarefaIndex].concluida = concluida;
+  }
+
+  return res.status(200).json({ message: "Tarefa atualizada com sucesso!", tarefa: tarefas[tarefaIndex] });
+})
+
+app.delete("/tarefas/:id", (req, res) => {
+  const { id } = req.params;
+
+  if (!id) {
+    return res.status(400).json({ message: "ID da tarefa não foi fornecido." });
+  }
+
+  const tarefaIndex = tarefas.findIndex((tarefa) => tarefa.id === parseInt(id));
+  if (tarefaIndex === -1) {
+      return res.status(404).json({ message: "Tarefa não encontrada." });
+  }
+
+  tarefas.splice(tarefaIndex, 1);
+
+  return res.status(200).json({ message: `Tarefa ${id} deletada com sucesso!` });
+});
+
+
+
+
+
+
 
 app.listen(PORT, () => console.log(`Servidor rodando na porta ${PORT}`));
